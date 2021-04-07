@@ -1,1 +1,4 @@
-/home/slycer/Projects/study/DIC_MapReduce/src/main/java/WordCount.java
+/home/slycerw/Projects/study/DIC_MapReduce/src/main/java/Preprocessor.java
+/home/slycerw/Projects/study/DIC_MapReduce/src/main/java/MyReducer.java
+/home/slycerw/Projects/study/DIC_MapReduce/src/main/java/ChiSquareByCategory.java
+/home/slycerw/Projects/study/DIC_MapReduce/src/main/java/MyMapper.java

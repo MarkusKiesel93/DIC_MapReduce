@@ -11,6 +11,7 @@
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <hadoop.version>3.3.0</hadoop.version>
     </properties>
 
     <build>
@@ -30,7 +31,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        org.example.DIC_MapReduce.WordCount
+                                        ChiSquareByCategory
                                     </mainClass>
                                 </manifest>
                             </archive>
@@ -45,16 +46,42 @@
     </build>
 
     <dependencies>
+        <!-- Hadoop main client artifact -->
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-client</artifactId>
+            <version>${hadoop.version}</version>
+        </dependency>
+        <!-- Unit test artifacts -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.mrunit</groupId>
+            <artifactId>mrunit</artifactId>
+            <version>1.1.0</version>
+            <classifier>hadoop2</classifier>
+            <scope>test</scope>
+        </dependency>
+        <!-- Hadoop test artifact for running mini clusters -->
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-minicluster</artifactId>
+            <version>${hadoop.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20210307</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-compiler-plugin</artifactId>
             <version>3.8.1</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-client -->
-        <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-client</artifactId>
-            <version>3.3.0</version>
         </dependency>
     </dependencies>
 
