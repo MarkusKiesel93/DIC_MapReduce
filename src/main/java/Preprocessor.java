@@ -564,13 +564,9 @@ public class Preprocessor {
 
         tokensSet.removeAll(this.stopWords);
 
-        List<String> tokens = new ArrayList<String>(tokensSet);
+        List<String> tokens = new ArrayList<>(tokensSet);
 
-        for (int i=0; i<tokens.size(); i++) {
-            if (tokens.get(i).length() < 2) {
-                tokens.remove(i);
-            }
-        }
+        tokens.removeIf(token -> (token.length() < 2));
 
         return tokens;
     }

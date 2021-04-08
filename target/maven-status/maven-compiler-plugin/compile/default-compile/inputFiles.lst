@@ -1,4 +1,11 @@
-/home/slycerw/Projects/study/DIC_MapReduce/src/main/java/Preprocessor.java
-/home/slycerw/Projects/study/DIC_MapReduce/src/main/java/MyReducer.java
-/home/slycerw/Projects/study/DIC_MapReduce/src/main/java/ChiSquareByCategory.java
-/home/slycerw/Projects/study/DIC_MapReduce/src/main/java/MyMapper.java
+/home/slycer/Projects/study/DIC_MapReduce/src/main/java/MyMapper2.java
+/home/slycer/Projects/study/DIC_MapReduce/src/main/java/Categories.java
+/home/slycer/Projects/study/DIC_MapReduce/src/main/java/Preprocessor.java
+/home/slycer/Projects/study/DIC_MapReduce/src/main/java/MyReducer2.java
+/home/slycer/Projects/study/DIC_MapReduce/src/main/java/CategoryReducer.java
+/home/slycer/Projects/study/DIC_MapReduce/src/main/java/TokenReducer.java
+/home/slycer/Projects/study/DIC_MapReduce/src/main/java/CategoryMapper.java
+/home/slycer/Projects/study/DIC_MapReduce/src/main/java/Category.java
+/home/slycer/Projects/study/DIC_MapReduce/src/main/java/ChiSquareByCategory.java
+/home/slycer/Projects/study/DIC_MapReduce/src/main/java/MyMapper1.java
+/home/slycer/Projects/study/DIC_MapReduce/src/main/java/MyReducer1.java
