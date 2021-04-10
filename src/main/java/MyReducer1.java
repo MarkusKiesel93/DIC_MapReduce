@@ -4,15 +4,18 @@ import org.apache.hadoop.io.Text;
 import java.io.IOException;
 import java.util.*;
 
-public class MyReducer1 extends org.apache.hadoop.mapreduce.Reducer<Text, Text, Text, Text> {
+public class MyReducer1 extends org.apache.hadoop.mapreduce.Reducer<Text, MyWritable, Text, Text> {
 
-    public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+    private final static Text N = new Text("N");
 
+    public void reduce(Text key, Iterable<MyWritable> values, Context context) throws IOException, InterruptedException {
+
+        // todo: write combine with only this top part
         HashMap<String, Integer> categoryMap = new HashMap<>();
         int tokenCount = 0;
-        for (Text val : values) {
-            categoryMap.merge(val.toString(), 1, Integer::sum);
-            tokenCount++;
+        for (MyWritable val : values) {
+            categoryMap.merge(val.getCategory(), val.getCount(), Integer::sum);
+            tokenCount += val.getCount();
         }
 
         for (String category : categoryMap.keySet()) {
