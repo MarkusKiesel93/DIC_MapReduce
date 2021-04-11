@@ -4,7 +4,7 @@ import org.apache.hadoop.io.Text;
 import java.io.IOException;
 import java.util.*;
 
-public class MyReducer1 extends org.apache.hadoop.mapreduce.Reducer<Text, MyWritable, Text, Text> {
+public class ABReducer extends org.apache.hadoop.mapreduce.Reducer<Text, MyWritable, Text, Text> {
 
     private final static Text N = new Text("N");
 

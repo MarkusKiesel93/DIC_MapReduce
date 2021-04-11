@@ -1,6 +1,5 @@
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Counter;
 import org.apache.hadoop.mapreduce.CounterGroup;
@@ -34,7 +33,7 @@ public class ChiSquareByCategory {
         job.setJarByClass(ChiSquareByCategory.class);
 
         // mapper
-        job.setMapperClass(MyMapper1.class);
+        job.setMapperClass(TokenizerMapper.class);
         job.setMapOutputKeyClass(Text.class);
         job.setMapOutputValueClass(MyWritable.class);
 
@@ -43,7 +42,7 @@ public class ChiSquareByCategory {
 //        job.setGroupingComparatorClass(MyComparator.class);
 
         // reducer
-        job.setReducerClass(MyReducer1.class);
+        job.setReducerClass(ABReducer.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
 
