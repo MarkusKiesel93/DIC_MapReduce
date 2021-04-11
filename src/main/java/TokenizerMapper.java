@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-public class TokenizerMapper extends Mapper<Object, Text, Text, MyWritable> {
+public class TokenizerMapper extends Mapper<Object, Text, Text, CategoryCountValue> {
 
     private Preprocessor pp = new Preprocessor();
     private final static IntWritable one = new IntWritable(1);
@@ -28,13 +28,14 @@ public class TokenizerMapper extends Mapper<Object, Text, Text, MyWritable> {
                 reviewText = obj.getString("reviewText");
 
                 // todo: only count total number, put category n -> for this the second reducer mast sort the values
+                // I dont even need to count the total category as for every category A + B == N
                 context.getCounter("CATEGORY", category.toString()).increment(1);
-                context.write(N, new MyWritable(category, one));
+                context.write(N, new CategoryCountValue(category, one));
 
                 // tokenize words using the given deliminators
                 List<String> tokens = pp.tokenizePreprocess(reviewText);
                 for (String token : tokens) {
-                    context.write(new Text(token), new MyWritable(category, one));
+                    context.write(new Text(token), new CategoryCountValue(category, one));
                 }
 
             } catch(JSONException | IOException | InterruptedException e){

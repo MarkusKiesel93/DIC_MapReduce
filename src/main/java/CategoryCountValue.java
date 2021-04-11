@@ -6,17 +6,17 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public class MyWritable implements Writable {
+public class CategoryCountValue implements Writable {
 
     private Text category;
     private IntWritable count;
 
-    public MyWritable(){
+    public CategoryCountValue(){
         this.category = new Text();
         this.count = new IntWritable();
     }
 
-    public MyWritable(Text category, IntWritable count) {
+    public CategoryCountValue(Text category, IntWritable count) {
         this.category = category;
         this.count = count;
     }

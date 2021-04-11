@@ -35,7 +35,10 @@ public class ChiSquareByCategory {
         // mapper
         job.setMapperClass(TokenizerMapper.class);
         job.setMapOutputKeyClass(Text.class);
-        job.setMapOutputValueClass(MyWritable.class);
+        job.setMapOutputValueClass(CategoryCountValue.class);
+
+        // combiner
+        job.setCombinerClass(TokenCombiner.class);
 
 //        // partition and grouping
 //        job.setPartitionerClass(MyPartitioner.class);
