@@ -47,7 +47,7 @@ public class ChiSquareByCategory {
         // reducer
         job.setReducerClass(ABReducer.class);
         job.setOutputKeyClass(Text.class);
-        job.setOutputValueClass(Text.class);
+        job.setOutputValueClass(TokenABValue.class);
 
         // input / output
         FileInputFormat.addInputPath(job, inputPath);
