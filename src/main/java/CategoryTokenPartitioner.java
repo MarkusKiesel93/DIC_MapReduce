@@ -5,7 +5,7 @@ public class CategoryTokenPartitioner extends Partitioner<CategoryTokenKey, IntW
 
     @Override
     public int getPartition(CategoryTokenKey key, IntWritable value, int numPartitions) {
-        return (key.getToken().hashCode() & Integer.MAX_VALUE) % numPartitions;
+        return Math.abs(key.getCategory().hashCode() % numPartitions);
     }
 
 }

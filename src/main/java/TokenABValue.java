@@ -13,9 +13,9 @@ public class TokenABValue implements Writable {
     private IntWritable B;
 
     public TokenABValue(){
-        this.token = new Text();
-        this.A = new IntWritable();
-        this.B = new IntWritable();
+        token = new Text();
+        A = new IntWritable(0);
+        B = new IntWritable(0);
     }
 
     public TokenABValue(Text token, IntWritable A, IntWritable B){
@@ -36,17 +36,30 @@ public class TokenABValue implements Writable {
         return B;
     }
 
+    public double getAasDouble() {
+        return A.get();
+    }
+
+    public double getBasDouble() {
+        return B.get();
+    }
+
     @Override
     public void readFields(DataInput in) throws IOException {
-        this.token.readFields(in);
-        this.A.readFields(in);
-        this.B.readFields(in);
+        token.readFields(in);
+        A.readFields(in);
+        B.readFields(in);
     }
 
     @Override
     public void write(DataOutput out) throws IOException {
-        this.token.write(out);
-        this.A.write(out);
-        this.B.write(out);
+        token.write(out);
+        A.write(out);
+        B.write(out);
+    }
+
+    @Override
+    public String toString() {
+        return token.toString() + ":" + A.toString() + ":" + B.toString();
     }
 }
