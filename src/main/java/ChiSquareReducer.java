@@ -2,13 +2,13 @@ import org.apache.hadoop.io.Text;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
-import java.util.LinkedHashMap;
-import java.util.TreeMap;
+import java.util.*;
 
 
 public class ChiSquareReducer extends org.apache.hadoop.mapreduce.Reducer<CategoryTokenKey, TokenABValue, Text, Text> {
 
     private final static Text N_TOKEN = new Text("N");
+    private final static Text MERGED = new Text("XXX");
 
     public void reduce(CategoryTokenKey key, Iterable<TokenABValue> values, Context context) throws IOException, InterruptedException {
 
@@ -22,7 +22,7 @@ public class ChiSquareReducer extends org.apache.hadoop.mapreduce.Reducer<Catego
         while (values.iterator().hasNext()) {
             tokenAB = values.iterator().next();
             double chiSquare = calculateChiSquare(tokenAB.getAasDouble(), tokenAB.getBasDouble(), categoryCount, n);
-            top150.add(tokenAB.getToken().toString(), chiSquare);
+            top150.addToken(tokenAB.getToken().toString(), chiSquare);
         }
 
         StringBuilder out = new StringBuilder();
@@ -31,6 +31,7 @@ public class ChiSquareReducer extends org.apache.hadoop.mapreduce.Reducer<Catego
             DecimalFormat df = new DecimalFormat("###.####");
             String chiSquare = df.format(tokenMap.get(token));
             out.append(token).append(":").append(chiSquare).append(" ");
+            context.write(MERGED, new Text(token));
         }
         context.write(key.getCategory(), new Text(out.toString()));
     }
@@ -45,52 +46,56 @@ public class ChiSquareReducer extends org.apache.hadoop.mapreduce.Reducer<Catego
 
     private class Top150ChiSquareTokens {
 
+        TreeMap<Double, ArrayList<String>> tokenTree;
         LinkedHashMap<String, Double> tokenMap;
-        String cutoffToken;
-        Double cutoffValue;
+        int size;
+        double minChiSquare = Double.MAX_VALUE;
 
         public Top150ChiSquareTokens() {
+            tokenTree = new TreeMap<>();
             tokenMap = new LinkedHashMap<>();
-            cutoffToken = null;
-            cutoffValue = Double.MAX_VALUE;
+            size = 0;
         }
 
         public LinkedHashMap<String, Double> getTokenMap() {
+            for (Double key : tokenTree.descendingKeySet()) {
+                ArrayList<String> values = tokenTree.get(key);
+                for (String val : values) {
+                    tokenMap.put(val, key);
+                }
+            }
+            assert tokenMap.size() == 150;
             return tokenMap;
         }
 
-        public void add(String token, Double value) {
-            if (tokenMap.size() < 150) {
-                tokenMap.put(token, value);
-                if (value < cutoffValue) {
-                    setNewCutoff(token, value);
-                }
+        public void addToken(String token, Double chiSquare) {
+            if (size < 150) {
+                add(chiSquare, token);
+                minChiSquare = tokenTree.firstKey();
             } else {
-                if (value > cutoffValue) {
-                    tokenMap.remove(cutoffToken);
-                    tokenMap.put(token, value);
-                    setNewCutoff();
+                if (chiSquare > minChiSquare) {
+                    remove(minChiSquare);
+                    add(chiSquare, token);
+                    minChiSquare = tokenTree.firstKey();
                 }
             }
         }
 
-        private void setNewCutoff(String token, Double value) {
-            cutoffToken = token;
-            cutoffValue = value;
+        private void add(Double key, String value) {
+            if (tokenTree.containsKey(key)) {
+                tokenTree.get(key).add(value);
+            } else {
+                ArrayList<String> newValue = new ArrayList<>();
+                newValue.add(value);
+                tokenTree.put(key, newValue);
+            }
+            size++;
         }
 
-        private void setNewCutoff() {
-            double min = Double.MAX_VALUE;
-            String token = null;
-            for (String t : tokenMap.keySet()) {
-                double v = tokenMap.get(t);
-                if (v < min) {
-                    token = t;
-                    min = v;
-                }
-            }
-            cutoffToken = token;
-            cutoffValue = min;
+        private void remove(Double key) {
+            ArrayList<String> values = tokenTree.get(key);
+            size -= values.size();
+            tokenTree.remove(key);
         }
     }
 }
