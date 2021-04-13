@@ -48,9 +48,9 @@ public class CategoryTokenKey implements WritableComparable<CategoryTokenKey> {
             // make sure N is always first in each category
             // then sort by token
             if (token.equals(N_TOKEN)) {
-                compareValue = 1;
-            } else if (key.getToken().equals(N_TOKEN)) {
                 compareValue = -1;
+            } else if (key.getToken().equals(N_TOKEN)) {
+                compareValue = 1;
             } else {
                 compareValue = token.compareTo(key.getToken());
             }

@@ -3,6 +3,7 @@ import org.apache.hadoop.io.Text;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.LinkedHashMap;
+import java.util.TreeMap;
 
 
 public class ChiSquareReducer extends org.apache.hadoop.mapreduce.Reducer<CategoryTokenKey, TokenABValue, Text, Text> {
@@ -12,43 +13,16 @@ public class ChiSquareReducer extends org.apache.hadoop.mapreduce.Reducer<Catego
     public void reduce(CategoryTokenKey key, Iterable<TokenABValue> values, Context context) throws IOException, InterruptedException {
 
         Top150ChiSquareTokens top150 = new Top150ChiSquareTokens();
-        double n = 0.;
-        double categoryCount = 0.;
-        TokenABValue tokenAB;
 
-        // first entry for category should always be N
-        try {
-            tokenAB = values.iterator().next();
-            if (!tokenAB.getToken().equals(N_TOKEN)) {
-                throw new Exception("N not sorted into first row");
-            }
-            categoryCount = tokenAB.getA().get();
-            n = categoryCount + tokenAB.getB().get();
-        } catch (Exception e) {
-            System.out.println(e.toString());
-        }
-
-        // precess all further rows
-        TokenABValue currentTokenAB = null;
-        double a = 0.;
-        double b = 0.;
+        // todo: test if this exists (maby assert)
+        TokenABValue tokenAB = values.iterator().next();
+        double categoryCount = tokenAB.getA().get();
+        double n = categoryCount + tokenAB.getB().get();
 
         while (values.iterator().hasNext()) {
             tokenAB = values.iterator().next();
-            if (currentTokenAB == null) {
-                currentTokenAB = tokenAB;
-            }
-            if (currentTokenAB.equals(tokenAB)) {
-                a += tokenAB.getAasDouble();
-                b += tokenAB.getBasDouble();
-            } else if (!currentTokenAB.equals(tokenAB)) {
-                double chiSquare = calculateChiSquare(a, b, categoryCount, n);
-                top150.add(currentTokenAB.getToken().toString(), chiSquare);
-
-                currentTokenAB = tokenAB;
-                a = tokenAB.getAasDouble();
-                b = tokenAB.getBasDouble();
-            }
+            double chiSquare = calculateChiSquare(tokenAB.getAasDouble(), tokenAB.getBasDouble(), categoryCount, n);
+            top150.add(tokenAB.getToken().toString(), chiSquare);
         }
 
         StringBuilder out = new StringBuilder();
