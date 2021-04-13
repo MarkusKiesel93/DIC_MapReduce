@@ -14,17 +14,18 @@ public class ChiSquareByCategory {
 
     public static void main(String[] args) throws Exception {
 
-        if (args.length != 3) {
+        if (args.length != 4) {
             throw new Exception("needs 3 arguments: inputPath, intermediatePath, outputPath");
         }
 
         Path inputPath = new Path(args[0]);
-        Path intermediatePath = new Path(args[1]); // todo: find better way
-        Path outputPath = new Path(args[2]);
+        Path intermediatePath1 = new Path(args[1]); // todo: find better way
+        Path intermediatePath2 = new Path(args[2]); // todo: find better way
+        Path outputPath = new Path(args[3]);
 
-        job1(inputPath, intermediatePath);
-        job2(intermediatePath, outputPath);
-
+        job1(inputPath, intermediatePath1);
+        job2(intermediatePath1, intermediatePath2);
+        job3(intermediatePath2, outputPath);
     }
 
     public static void job1(Path inputPath, Path outputPath) throws InterruptedException, IOException, ClassNotFoundException {
@@ -69,6 +70,29 @@ public class ChiSquareByCategory {
 
         // reducer
         job.setReducerClass(ChiSquareReducer.class);
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(Text.class);
+
+        // input / output
+        FileInputFormat.addInputPath(job, inputPath);
+        FileOutputFormat.setOutputPath(job, outputPath);
+
+        // wait for job finished
+        job.waitForCompletion(true);
+    }
+
+    public static void job3(Path inputPath, Path outputPath) throws InterruptedException, IOException, ClassNotFoundException {
+        Configuration conf = new Configuration();
+        Job job = Job.getInstance(conf, "job 3");
+        job.setJarByClass(ChiSquareByCategory.class);
+
+        // mapper
+        job.setMapperClass(OutputMapper.class);
+        job.setMapOutputKeyClass(Text.class);
+
+
+        // reducer
+        job.setReducerClass(OutputReducer.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
 
