@@ -27,9 +27,6 @@ public class TokenizerMapper extends Mapper<Object, Text, Text, CategoryCountVal
                 category = new Text(obj.getString("category"));
                 reviewText = obj.getString("reviewText");
 
-                // todo: only count total number, put category n -> for this the second reducer mast sort the values
-                // I dont even need to count the total category as for every category A + B == N
-                context.getCounter("CATEGORY", category.toString()).increment(1);
                 context.write(N, new CategoryCountValue(category, one));
 
                 // tokenize words using the given deliminators

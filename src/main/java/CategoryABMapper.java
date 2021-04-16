@@ -1,15 +1,11 @@
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
-import java.util.StringTokenizer;
 
-public class CategoryTokenABMapper extends Mapper<Object, Text, CategoryTokenKey, TokenABValue> {
+public class CategoryABMapper extends Mapper<Object, Text, CategoryAKey, TokenABValue> {
 
     // todo: find better way instead of splitting on input use automatic input from some SplitFlie
 
@@ -24,7 +20,7 @@ public class CategoryTokenABMapper extends Mapper<Object, Text, CategoryTokenKey
                 IntWritable A = new IntWritable(Integer.parseInt(v[1]));
                 IntWritable B = new IntWritable(Integer.parseInt(v[2]));
 
-                CategoryTokenKey categoryToken = new CategoryTokenKey(category, token);
+                CategoryAKey categoryToken = new CategoryAKey(category, A);
                 TokenABValue tokenAB = new TokenABValue(token, A, B);
 
                 context.write(categoryToken, tokenAB);

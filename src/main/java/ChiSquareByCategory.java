@@ -1,8 +1,6 @@
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Counter;
-import org.apache.hadoop.mapreduce.CounterGroup;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
@@ -23,9 +21,14 @@ public class ChiSquareByCategory {
         Path intermediatePath2 = new Path(args[2]); // todo: find better way
         Path outputPath = new Path(args[3]);
 
+        long startTime = System.currentTimeMillis();
         job1(inputPath, intermediatePath1);
         job2(intermediatePath1, intermediatePath2);
         job3(intermediatePath2, outputPath);
+        long endTime = System.currentTimeMillis();
+        long duration = (endTime - startTime);  //Total execution time in milli seconds
+
+        System.out.println(duration);
     }
 
     public static void job1(Path inputPath, Path outputPath) throws InterruptedException, IOException, ClassNotFoundException {
@@ -60,13 +63,13 @@ public class ChiSquareByCategory {
         job.setJarByClass(ChiSquareByCategory.class);
 
         // mapper
-        job.setMapperClass(CategoryTokenABMapper.class);
-        job.setMapOutputKeyClass(CategoryTokenKey.class);
+        job.setMapperClass(CategoryABMapper.class);
+        job.setMapOutputKeyClass(CategoryAKey.class);
         job.setMapOutputValueClass(TokenABValue.class);
 
         // partition and grouping
-        job.setPartitionerClass(CategoryTokenPartitioner.class);
-        job.setGroupingComparatorClass(CategoryTokenComparator.class);
+        job.setPartitionerClass(CategoryAPartitioner.class);
+        job.setGroupingComparatorClass(CategoryAComparator.class);
 
         // reducer
         job.setReducerClass(ChiSquareReducer.class);
@@ -86,19 +89,23 @@ public class ChiSquareByCategory {
         Job job = Job.getInstance(conf, "job 3");
         job.setJarByClass(ChiSquareByCategory.class);
 
+        // input / output
+        FileInputFormat.addInputPath(job, inputPath);
+        FileOutputFormat.setOutputPath(job, outputPath);
+
         // mapper
         job.setMapperClass(OutputMapper.class);
-        job.setMapOutputKeyClass(Text.class);
+        job.setMapOutputKeyClass(OutputKey.class);
+        job.setMapOutputValueClass(Text.class);
 
+        // partition and grouping
+        job.setPartitionerClass(OutputPartitioner.class);
+        job.setGroupingComparatorClass(OutputComparator.class);
 
         // reducer
         job.setReducerClass(OutputReducer.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
-
-        // input / output
-        FileInputFormat.addInputPath(job, inputPath);
-        FileOutputFormat.setOutputPath(job, outputPath);
 
         // wait for job finished
         System.exit(job.waitForCompletion(true) ? 0 : 1);

@@ -1,3 +1,4 @@
+import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.Text;
 
 import java.io.IOException;
@@ -5,16 +6,15 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 
-public class ChiSquareReducer extends org.apache.hadoop.mapreduce.Reducer<CategoryTokenKey, TokenABValue, Text, Text> {
+public class ChiSquareReducer extends org.apache.hadoop.mapreduce.Reducer<CategoryAKey, TokenABValue, Text, Text> {
 
-    private final static Text N_TOKEN = new Text("N");
-    private final static Text MERGED = new Text("XXX");
+    // todo: ask if this is bad prcatice to store te values in a data structure or if it is ok for only 150 values
 
-    public void reduce(CategoryTokenKey key, Iterable<TokenABValue> values, Context context) throws IOException, InterruptedException {
+    public void reduce(CategoryAKey key, Iterable<TokenABValue> values, Context context) throws IOException, InterruptedException {
 
         Top150ChiSquareTokens top150 = new Top150ChiSquareTokens();
 
-        // todo: test if this exists (maby assert)
+        // todo: test if correctly sorted
         TokenABValue tokenAB = values.iterator().next();
         double categoryCount = tokenAB.getA().get();
         double n = categoryCount + tokenAB.getB().get();
@@ -25,15 +25,10 @@ public class ChiSquareReducer extends org.apache.hadoop.mapreduce.Reducer<Catego
             top150.addToken(tokenAB.getToken().toString(), chiSquare);
         }
 
-        StringBuilder out = new StringBuilder();
         LinkedHashMap<String, Double> tokenMap = top150.getTokenMap();
         for (String token : tokenMap.keySet()) {
-            DecimalFormat df = new DecimalFormat("###.####");
-            String chiSquare = df.format(tokenMap.get(token));
-            out.append(token).append(":").append(chiSquare).append(" ");
-            context.write(MERGED, new Text(token));
+            context.write(key.getCategory(), new Text(token + ":" + tokenMap.get(token)));
         }
-        context.write(key.getCategory(), new Text(out.toString()));
     }
 
     private double calculateChiSquare(double a, double b, double categoryCount, double n) {
@@ -58,7 +53,7 @@ public class ChiSquareReducer extends org.apache.hadoop.mapreduce.Reducer<Catego
         }
 
         public LinkedHashMap<String, Double> getTokenMap() {
-            for (Double key : tokenTree.descendingKeySet()) {
+            for (Double key : tokenTree.keySet()) {
                 ArrayList<String> values = tokenTree.get(key);
                 for (String val : values) {
                     tokenMap.put(val, key);
