@@ -1,48 +1,53 @@
-import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.Text;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
 import java.util.*;
 
 
 public class ChiSquareReducer extends org.apache.hadoop.mapreduce.Reducer<CategoryAKey, TokenABValue, Text, Text> {
 
-    // todo: ask if this is bad prcatice to store te values in a data structure or if it is ok for only 150 values
-
     public void reduce(CategoryAKey key, Iterable<TokenABValue> values, Context context) throws IOException, InterruptedException {
 
+        // create data structure to efficiently store top 150 chi-squared values
         Top150ChiSquareTokens top150 = new Top150ChiSquareTokens();
 
-        // todo: test if correctly sorted
+        // each reducer is sorted so the highest value has to be the total number the category exists
+        // the total count n is the number of times the category exists (A) + number of times the category does not exist (B)
         TokenABValue tokenAB = values.iterator().next();
         double categoryCount = tokenAB.getA().get();
         double n = categoryCount + tokenAB.getB().get();
 
+        // iterate over all other values and calculating chi-square by token
+        // each token only exists once for the category
         while (values.iterator().hasNext()) {
             tokenAB = values.iterator().next();
-            double chiSquare = calculateChiSquare(tokenAB.getAasDouble(), tokenAB.getBasDouble(), categoryCount, n);
+            double a = tokenAB.getAasDouble();
+            double b = tokenAB.getBasDouble();
+            // C -> number of times the document has the category but not the token
+            double c = categoryCount - a;
+            // D -> number of times the document does not have the category and token
+            double d = n - (a + b + c);
+            // calculate chi-squared according to given formula
+            double chiSquare = (n * Math.pow((a*d - b*c),2.)) / ((a+b) * (a+c) * (b+d) * (c+d));
+
+            // stores token if larger than the smallest current chi-squared value
             top150.addToken(tokenAB.getToken().toString(), chiSquare);
         }
 
-        LinkedHashMap<String, Double> tokenMap = top150.getTokenMap();
+        // emit the top 150 chi-squared values + tokens
+        // key -> CATEGORY, value -> (TOKEN, CHI-SQUARED)
+        HashMap<String, Double> tokenMap = top150.getTokenMap();
         for (String token : tokenMap.keySet()) {
             context.write(key.getCategory(), new Text(token + ":" + tokenMap.get(token)));
         }
     }
 
-    private double calculateChiSquare(double a, double b, double categoryCount, double n) {
-        double c = categoryCount - a;
-        double d = n - (a + b + c);
 
-        return (n * Math.pow((a*d - b*c),2.)) / ((a+b) * (a+c) * (b+d) * (c+d));
-    }
-
-
+    // data structure used to store the top 150 chi-squared values
     private class Top150ChiSquareTokens {
 
         TreeMap<Double, ArrayList<String>> tokenTree;
-        LinkedHashMap<String, Double> tokenMap;
+        HashMap<String, Double> tokenMap;
         int size;
         double minChiSquare = Double.MAX_VALUE;
 
@@ -52,7 +57,8 @@ public class ChiSquareReducer extends org.apache.hadoop.mapreduce.Reducer<Catego
             size = 0;
         }
 
-        public LinkedHashMap<String, Double> getTokenMap() {
+        // return the top values in a Map
+        public HashMap<String, Double> getTokenMap() {
             for (Double key : tokenTree.keySet()) {
                 ArrayList<String> values = tokenTree.get(key);
                 for (String val : values) {
@@ -63,6 +69,7 @@ public class ChiSquareReducer extends org.apache.hadoop.mapreduce.Reducer<Catego
             return tokenMap;
         }
 
+        // add token and chi square value to TreeMap if chi-squared value larger than the smallest current value
         public void addToken(String token, Double chiSquare) {
             if (size < 150) {
                 add(chiSquare, token);
@@ -76,6 +83,7 @@ public class ChiSquareReducer extends org.apache.hadoop.mapreduce.Reducer<Catego
             }
         }
 
+        // add new token to TreeMap
         private void add(Double key, String value) {
             if (tokenTree.containsKey(key)) {
                 tokenTree.get(key).add(value);
@@ -87,10 +95,16 @@ public class ChiSquareReducer extends org.apache.hadoop.mapreduce.Reducer<Catego
             size++;
         }
 
+        // remove token form TreeMap
         private void remove(Double key) {
             ArrayList<String> values = tokenTree.get(key);
-            size -= values.size();
-            tokenTree.remove(key);
+            int len = values.size();
+            if (len == 1) {
+                tokenTree.remove(key);
+            } else {
+                tokenTree.get(key).remove(len - 1);
+            }
+            size--;
         }
     }
 }

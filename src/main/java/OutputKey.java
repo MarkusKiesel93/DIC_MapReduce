@@ -7,9 +7,11 @@ import java.io.IOException;
 
 public class OutputKey implements WritableComparable<OutputKey> {
 
+    // store CATEGORY + (CHI-SQUARED OR TOKEN)
     private Text category;
     private Text valueToken;
 
+    // default constructor for serialization and deserialization
     public OutputKey(){
         category = new Text();
         valueToken = new Text();
@@ -28,40 +30,50 @@ public class OutputKey implements WritableComparable<OutputKey> {
         return valueToken;
     }
 
+    // need to be overwritten for working Writeable
     @Override
     public void write(DataOutput out) throws IOException {
         category.write(out);
         valueToken.write(out);
     }
 
+    // need to be overwritten for working Writeable
     @Override
     public void readFields(DataInput in) throws IOException {
         category.readFields(in);
         valueToken.readFields(in);
     }
 
+    // for writing output key to file
     @Override
     public String toString() {
         return category.toString() + ":" + valueToken.toString();
     }
 
+    // needed for comparing values
     @Override
     public int compareTo(OutputKey key) {
-        Text TOKEN = new Text("T");
+        Text CATEGORY_TOKEN = new Text("T");
         int compareValue;
+
+        // compare if CATEGORY is the same
         compareValue = category.compareTo(key.getCategory());
 
-        // sort the special TOKEN category to last place
-        if (compareValue != 0 && category.equals(TOKEN)) {
+        // sort the special CATEGORY_TOKEN to last place (last line in output file)
+        if (compareValue != 0 && category.equals(CATEGORY_TOKEN)) {
             compareValue = 1;
         }
-        if (compareValue != 0 && key.getCategory().equals(TOKEN)) {
+        if (compareValue != 0 && key.getCategory().equals(CATEGORY_TOKEN)) {
             compareValue = -1;
         }
+        // sorting by value if CATEGORY the same
         if (compareValue == 0) {
-            if (category.equals(TOKEN)) {
+            // differentiate between special category CATEGORY_TOKEN and all others
+            if (category.equals(CATEGORY_TOKEN)) {
+                // sort tokens alphabetically
                 compareValue = valueToken.compareTo(key.getValueToken());
             } else {
+                // sort CHI-SQUARED values descending
                 double value1 = Double.parseDouble(valueToken.toString());
                 double value2 = Double.parseDouble(key.getValueToken().toString());
                 if (value1 == value2) {

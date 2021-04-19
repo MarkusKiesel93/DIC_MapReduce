@@ -5,10 +5,12 @@ import java.io.Serializable;
 
 public class OutputComparator extends WritableComparator implements Serializable {
 
+    // invoke constructor.super
     OutputComparator() {
         super(OutputKey.class, true);
     }
 
+    // use CATEGORY for mapping to same reducer
     @Override
     public int compare(WritableComparable wcA, WritableComparable wcB) {
         OutputKey keyA = (OutputKey) wcA;

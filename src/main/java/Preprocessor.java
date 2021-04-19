@@ -2,6 +2,7 @@ import java.util.*;
 
 public class Preprocessor {
 
+    // hard code all stopwords to remove need of reading in file in each mapper
     Set<String> stopWords = new HashSet<String>(Arrays.asList(
         "a",
         "aa",
@@ -556,18 +557,21 @@ public class Preprocessor {
     ));
 
 
-    public List<String> tokenizePreprocess(String text) {
+    public HashSet<String> tokenizePreprocess(String text) {
 
+        // Case folding
         text = text.toLowerCase();
 
-        Set<String> tokensSet = new HashSet<String>(Arrays.asList(text.split("[ .!?,;:()\\[\\]{}\\-_\"'`~#&*%$\\\\/]+")));
+        // Tokenization: splitting data by given delimiters using regex
+        // use HashSet to automatically remove duplicate tokens
+        HashSet<String> tokensSet = new HashSet<String>(Arrays.asList(text.split("[ \t0123456789.!?,;:()\\[\\]{}\\-_\"'`~#&*%$\\\\/]+")));
 
+        // remove stopwords
         tokensSet.removeAll(this.stopWords);
 
-        List<String> tokens = new ArrayList<>(tokensSet);
+        // remove tokens consisting of only one character
+        tokensSet.removeIf(token -> (token.length() < 2));
 
-        tokens.removeIf(token -> (token.length() < 2));
-
-        return tokens;
+        return tokensSet;
     }
 }

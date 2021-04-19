@@ -8,10 +8,12 @@ import java.io.IOException;
 
 public class TokenABValue implements Writable {
 
+    // store TOKEN, A and B
     private Text token;
     private IntWritable A;
     private IntWritable B;
 
+    // default constructor for serialization and deserialization
     public TokenABValue(){
         token = new Text();
         A = new IntWritable(0);
@@ -44,6 +46,7 @@ public class TokenABValue implements Writable {
         return B.get();
     }
 
+    // need to be overwritten for working Writeable
     @Override
     public void readFields(DataInput in) throws IOException {
         token.readFields(in);
@@ -51,6 +54,7 @@ public class TokenABValue implements Writable {
         B.readFields(in);
     }
 
+    // need to be overwritten for working Writeable
     @Override
     public void write(DataOutput out) throws IOException {
         token.write(out);
@@ -58,6 +62,7 @@ public class TokenABValue implements Writable {
         B.write(out);
     }
 
+    // define how data is written to file
     @Override
     public String toString() {
         return token.toString() + ":" + A.toString() + ":" + B.toString();

@@ -8,9 +8,11 @@ import java.io.IOException;
 
 public class CategoryCountValue implements Writable {
 
+    // store value (CATEGORY, COUNT)
     private Text category;
     private IntWritable count;
 
+    // default constructor for serialization and deserialization
     public CategoryCountValue(){
         this.category = new Text();
         this.count = new IntWritable();
@@ -29,12 +31,14 @@ public class CategoryCountValue implements Writable {
         return this.count.get();
     }
 
+    // need to be overwritten for working Writeable
     @Override
     public void readFields(DataInput in) throws IOException {
         this.category.readFields(in);
         this.count.readFields(in);
     }
 
+    // need to be overwritten for working Writeable
     @Override
     public void write(DataOutput out) throws IOException {
         this.category.write(out);

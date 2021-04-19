@@ -4,10 +4,12 @@ import java.io.Serializable;
 
 public class CategoryAComparator extends WritableComparator implements Serializable {
 
+    // invoke constructor.super
     CategoryAComparator() {
         super(CategoryAKey.class, true);
     }
 
+    // use CATEGORY for mapping to same reducer
     @Override
     public int compare(WritableComparable wcA, WritableComparable wcB) {
         CategoryAKey keyA = (CategoryAKey) wcA;
