@@ -31,7 +31,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        ChiSquareByCategory
+                                        ChiSquaredByCategory
                                     </mainClass>
                                 </manifest>
                             </archive>

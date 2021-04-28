@@ -8,7 +8,6 @@ public class OutputReducer extends org.apache.hadoop.mapreduce.Reducer<OutputKey
 
     public void reduce(OutputKey key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
 
-        int i = 0;
         StringBuilder out = new StringBuilder();
 
         // for special category CATEGORY_TOKEN (merged list of tokens in the end of the file)
@@ -17,16 +16,16 @@ public class OutputReducer extends org.apache.hadoop.mapreduce.Reducer<OutputKey
             String lastToken = "";
             for (Text token : values) {
                 // make sure again only 150 values emitted
-                if (i < 150 && !token.toString().equals(lastToken)) {
+                if (!token.toString().equals(lastToken)) {
                     out.append(token.toString()).append(" ");
                     lastToken = token.toString();
-                    i++;
                 }
             }
             // emit list of all tokens separated by " "
             // key -> DISTINCT TOP 150 TOKENS OVER ALL CATEGORIES, value -> ""
             context.write(new Text(out.toString()), new Text(""));
         } else {
+            int i = 0;
             for (Text tokenValue : values) {
                 // make sure again only 150 values emitted
                 if (i < 150) {

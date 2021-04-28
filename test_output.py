@@ -1,6 +1,6 @@
 from pathlib import Path
 
-OUTPUT_FILE = Path('./output/working_test.txt')
+OUTPUT_FILE = Path('./output.txt')
 
 with open(OUTPUT_FILE, 'r') as file:
     lines = file.readlines()
@@ -9,9 +9,10 @@ with open(OUTPUT_FILE, 'r') as file:
 categories = []
 token_value_strings = []
 for i in range(len(lines) - 1):
-    kv = lines[i].split('\t')
+    kv = lines[i].split()
+    values = ' '.join(kv[1:])
     categories.append(kv[0])
-    token_value_strings.append(kv[1])
+    token_value_strings.append(values)
 
 # categories sorted
 for i in range(len(categories)):
