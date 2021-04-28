@@ -51,7 +51,6 @@ public class ChiSquaredByCategory {
         // reducer
         // input: key -> TOKEN, values -> [(CATEGORY, COUNT), ...]
         // output: key -> CATEGORY, value -> (TOKEN, A, B)
-        job.setNumReduceTasks(30);
         job.setReducerClass(ABReducer.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(TokenABValue.class);
@@ -88,7 +87,6 @@ public class ChiSquaredByCategory {
         // reducer
         // input: key -> (CATEGORY, A), values -> [(TOKEN, A, B), ...]
         // output: key -> CATEGORY, value -> (TOKEN, CHI-SQUARED)
-        job.setNumReduceTasks(15);
         job.setReducerClass(ChiSquaredReducer.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
@@ -126,7 +124,6 @@ public class ChiSquaredByCategory {
         job.setGroupingComparatorClass(OutputComparator.class);
 
         // reducer
-        job.setNumReduceTasks(2);
         job.setReducerClass(OutputReducer.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
