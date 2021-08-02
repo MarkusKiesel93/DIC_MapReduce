@@ -14,5 +14,6 @@ The [Amazon Review Dataset](http://jmcauley.ucsd.edu/data/amazon/index.html) is 
 * Order the terms according to their value per category and preserve the top 150 terms per category
 * Merge the lists over all categories
 
-Shema:
-![Alt text](DIC_E1_shema.pnq?raw=true "MapReduce Shema")
+### Shema:
+
+![Alt text](DIC_E1_shema.png "MapReduce Shema")
