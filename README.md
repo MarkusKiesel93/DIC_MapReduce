@@ -9,7 +9,10 @@ The [Amazon Review Dataset](http://jmcauley.ucsd.edu/data/amazon/index.html) is 
 * Case folding
 * Stopword filtering: use the stop word list on TUWEL. In addition, filter all tokens consisting of only one character.
 
-### Write MapReduce jobs that efficiently
+### Write MapReduce jobs that efficiently:
 * Calculate chi-square values for all unigram terms for each category
 * Order the terms according to their value per category and preserve the top 150 terms per category
 * Merge the lists over all categories
+
+Shema:
+![Alt text](DIC_E1_shema.pnq?raw=true "MapReduce Shema")
